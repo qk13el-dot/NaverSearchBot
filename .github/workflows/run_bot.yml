@@ -1,0 +1,33 @@
+name: Daily Naver Search Report
+
+on:
+  schedule:
+    # 매일 한국 시간 아침 8:00 (UTC 기준 23:00)에 자동 실행
+    - cron: '0 23 * * *'
+  workflow_dispatch: # 웹에서 수동으로도 즉시 실행할 수 있는 버튼 제공
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 소스코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: 파이썬 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 의존성 패키지 설치
+        run: |
+          pip install python-dotenv
+
+      - name: 봇 실행
+        env:
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
+          RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
+        run: |
+          python naver_search_bot.py
